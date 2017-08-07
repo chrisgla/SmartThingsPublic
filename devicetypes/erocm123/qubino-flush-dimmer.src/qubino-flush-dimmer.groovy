@@ -3,7 +3,7 @@
  *  Qubino Flush Dimmer
  *   
  *	github: Eric Maycock (erocm123)
- *	Date: 2017-02-21
+ *	Date: 2017-Aug-07
  *	Copyright Eric Maycock
  *
  *  Includes all configuration parameters and ease of advanced configuration. 
@@ -21,7 +21,7 @@
  
 metadata {
 
-	definition (name: "Qubino Flush Dimmer", namespace: "erocm123", author: "Eric Maycock") {
+	definition (name: "Qubino Flush Dimmer 070817", namespace: "erocm123", author: "Eric Maycock") {
 		capability "Actuator"
 		capability "Switch"
         capability "Switch Level"
@@ -879,4 +879,184 @@ Default: Disabled
   </Value>
 </configuration>
 '''
+}
+
+/**
+*			--------	ASSOCIATION GROUP SECTION	--------
+*/
+				input name: "assocGroup2", type: "text", required: false,
+					title: "Association group 2: \n" +
+						   "Basic on/off (triggered at change of the input I1 and reflecting state of the output Q) up to 16 nodes.\n" +
+						   "NOTE: Insert the node Id value of the devices you wish to associate this group with. Multiple nodeIds can also be set at once by separating individual values by a comma (2,3,...)."
+						   
+				input name: "assocGroup3", type: "text", required: false,
+					title: "Association group 3: \n" +
+						   "Start level change/stop level change (triggered at change of the input I1 state and reflecting its state) up to 16 nodes." +
+						   "NOTE: Insert the node Id value of the devices you wish to associate this group with. Multiple nodeIds can also be set at once by separating individual values by a comma (2,3,...)."
+						   
+				input name: "assocGroup4", type: "text", required: false,
+					title: "Association group 4: \n" +
+						   "Multilevel set (triggered at changes of state/value of the Flush Dimmer) up to 16 nodes." +
+						   "NOTE: Insert the node Id value of the devices you wish to associate this group with. Multiple nodeIds can also be set at once by separating individual values by a comma (2,3,...)."
+						   
+				input name: "assocGroup5", type: "text", required: false,
+					title: "Association group 5: \n" +
+						   "Basic on/off (triggered at change of the input I2 state and reflecting its state) up to 16 nodes.\n" +
+						   "NOTE: Insert the node Id value of the devices you wish to associate this group with. Multiple nodeIds can also be set at once by separating individual values by a comma (2,3,...)."
+						   
+				input name: "assocGroup6", type: "text", required: false,
+					title: "Association group 6: \n" +
+						   "Notification report (triggered at change of the input I2 state and reflecting its state) up to 16 nodes.\n" +
+						   "NOTE: Insert the node Id value of the devices you wish to associate this group with. Multiple nodeIds can also be set at once by separating individual values by a comma (2,3,...)."
+						   
+				input name: "assocGroup7", type: "text", required: false,
+					title: "Association group 7: \n" +
+						   "Binary sensor (triggered at change of the input I2 state and reflecting its state) up to 16 nodes.\n" +
+						   "NOTE: Insert the node Id value of the devices you wish to associate this group with. Multiple nodeIds can also be set at once by separating individual values by a comma (2,3,...)."
+						   
+				input name: "assocGroup8", type: "text", required: false,
+					title: "Association group 8: \n" +
+						   "Basic on/off (triggered at change of the input I3 state and reflecting its state) up to 16 nodes.\n" +
+						   "NOTE: Insert the node Id value of the devices you wish to associate this group with. Multiple nodeIds can also be set at once by separating individual values by a comma (2,3,...)."
+						   
+				input name: "assocGroup9", type: "text", required: false,
+					title: "Association group 9: \n" +
+						   "Notification report (triggered at change of the input I3 state and reflecting its state) up to 16 nodes.\n" +
+						   "NOTE: Insert the node Id value of the devices you wish to associate this group with. Multiple nodeIds can also be set at once by separating individual values by a comma (2,3,...)."
+						   
+				input name: "assocGroup10", type: "text", required: false,
+					title: "Association group 10: \n" +
+						   "Binary sensor report (triggered at change of the input I3 state and reflecting its state) up to 16 nodes.\n" +
+						   "NOTE: Insert the node Id value of the devices you wish to associate this group with. Multiple nodeIds can also be set at once by separating individual values by a comma (2,3,...)."
+						   
+				input name: "assocGroup11", type: "text", required: false,
+					title: "Association group 11: \n" +
+						   "Multilevel sensor report (triggered at change of temperature sensor) up to 16 nodes.\n" +
+						   "NOTE: Insert the node Id value of the devices you wish to associate this group with. Multiple nodeIds can also be set at once by separating individual values by a comma (2,3,...)."
+
+
+/**
+ * setAssociations command handler that sets user selected association groups. In case no node id is insetred the group is instead cleared.
+ * Lifeline association hidden from user influence by design.
+ *
+ * @param void
+ * @return List of Association commands that will be executed in sequence with 500 ms delay inbetween.
+*/
+
+def setAssociation() {
+	log.debug "Qubino Flush Dimmer: setAssociation()"
+	def assocSet = []
+	if(settings.assocGroup2 != null){
+		def group2parsed = settings.assocGroup2.tokenize(",")
+		if(group2parsed == null){
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:2, nodeId:assocGroup2).format()
+		}else{
+			group2parsed = convertStringListToIntegerList(group2parsed)
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:2, nodeId:group2parsed).format()
+		}
+	}else{
+		assocSet << zwave.associationV2.associationRemove(groupingIdentifier:2).format()
+	}
+	if(settings.assocGroup3 != null){
+		def group3parsed = settings.assocGroup3.tokenize(",")
+		if(group3parsed == null){
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:3, nodeId:assocGroup3).format()
+		}else{
+			group3parsed = convertStringListToIntegerList(group3parsed)
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:3, nodeId:group3parsed).format()
+		}
+	}else{
+		assocSet << zwave.associationV2.associationRemove(groupingIdentifier:3).format()
+	}
+	if(settings.assocGroup4 != null){
+		def group4parsed = settings.assocGroup4.tokenize(",")
+		if(group4parsed == null){
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:4, nodeId:assocGroup4).format()
+		}else{
+			group4parsed = convertStringListToIntegerList(group4parsed)
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:4, nodeId:group4parsed).format()
+		}
+	}else{
+		assocSet << zwave.associationV2.associationRemove(groupingIdentifier:4).format()
+	}
+	if(settings.assocGroup5 != null){
+		def group5parsed = settings.assocGroup5.tokenize(",")
+		if(group5parsed == null){
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:5, nodeId:assocGroup5).format()
+		}else{
+			group5parsed = convertStringListToIntegerList(group5parsed)
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:5, nodeId:group5parsed).format()
+		}
+	}else{
+		assocSet << zwave.associationV2.associationRemove(groupingIdentifier:5).format()
+	}
+	if(settings.assocGroup6 != null){
+		def group6parsed = settings.assocGroup6.tokenize(",")
+		if(group6parsed == null){
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:6, nodeId:assocGroup6).format()
+		}else{
+			group6parsed = convertStringListToIntegerList(group6parsed)
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:6, nodeId:group6parsed).format()
+		}
+	}else{
+		assocSet << zwave.associationV2.associationRemove(groupingIdentifier:6).format()
+	}
+	if(settings.assocGroup7 != null){
+		def group7parsed = settings.assocGroup7.tokenize(",")
+		if(group7parsed == null){
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:7, nodeId:assocGroup7).format()
+		}else{
+			group7parsed = convertStringListToIntegerList(group7parsed)
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:7, nodeId:group7parsed).format()
+		}
+	}else{
+		assocSet << zwave.associationV2.associationRemove(groupingIdentifier:7).format()
+	}
+	if(settings.assocGroup8 != null){
+		def group8parsed = settings.assocGroup8.tokenize(",")
+		if(group8parsed == null){
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:8, nodeId:assocGroup8).format()
+		}else{
+			group8parsed = convertStringListToIntegerList(group8parsed)
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:8, nodeId:group8parsed).format()
+		}
+	}else{
+		assocSet << zwave.associationV2.associationRemove(groupingIdentifier:8).format()
+	}
+	if(settings.assocGroup9 != null){
+		def group9parsed = settings.assocGroup9.tokenize(",")
+		if(group9parsed == null){
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:9, nodeId:assocGroup9).format()
+		}else{
+			group9parsed = convertStringListToIntegerList(group9parsed)
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:9, nodeId:group9parsed).format()
+		}
+	}else{
+		assocSet << zwave.associationV2.associationRemove(groupingIdentifier:9).format()
+	}
+	if(settings.assocGroup10 != null){
+		def group10parsed = settings.assocGroup10.tokenize(",")
+		if(group10parsed == null){
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:10, nodeId:assocGroup10).format()
+		}else{
+			group10parsed = convertStringListToIntegerList(group10parsed)
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:10, nodeId:group10parsed).format()
+		}
+	}else{
+		assocSet << zwave.associationV2.associationRemove(groupingIdentifier:10).format()
+	}
+	if(settings.assocGroup11 != null){
+		def group11parsed = settings.assocGroup11.tokenize(",")
+		if(group11parsed == null){
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:11, nodeId:assocGroup11).format()
+		}else{
+			group11parsed = convertStringListToIntegerList(group11parsed)
+			assocSet << zwave.associationV1.associationSet(groupingIdentifier:11, nodeId:group11parsed).format()
+		}
+	}else{
+		assocSet << zwave.associationV2.associationRemove(groupingIdentifier:11).format()
+	}
+	if(assocSet.size() > 0){
+		return delayBetween(assocSet, 500)
+	}
 }
